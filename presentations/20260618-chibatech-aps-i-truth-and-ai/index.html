@@ -1,0 +1,772 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Truth &amp; AI | Chiba Tech APS-I</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Sans+JP:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+  <style>
+    :root {
+      --bg: #f7f3ee; --fg: #2a2a28; --dim: #444; --accent: #64506e;
+      --accent2: #9a7a3a; --accent3: #b84a3a; --accent4: #6a5a8a;
+      --card-bg: #fefcf8; --card-border: #ddd8d0;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    html { font-size: 80%; } /* default font size reduced 20%; scales all rem-based text */
+    html, body { height: 100%; overflow: hidden; background: var(--bg); color: var(--fg);
+      font-family: "IBM Plex Sans", "IBM Plex Sans JP", system-ui, "Hiragino Sans", sans-serif; }
+    .slide h1, .slide h2, .slide h3 { font-family: Georgia, "Palatino Linotype", "Hiragino Mincho ProN", "Noto Serif JP", serif; }
+
+    /* slides — sized for 1080p projection */
+    .slide { position: absolute; inset: 0; display: none; padding: 5vh 6vw; flex-direction: column; }
+    .slide.active { display: flex; }
+    .slide h1 { font-size: 5.4rem; line-height: 1.1; letter-spacing: -0.02em; }
+    .slide h2 { font-size: 3.6rem; margin-bottom: 2.5vh; color: var(--accent); }
+    .slide h3 { font-size: 2.4rem; margin-bottom: 2vh; color: var(--accent2); }
+    .slide .subtitle { font-size: 2.6rem; color: var(--accent); max-width: 80ch; }
+    .slide ul { margin: 1.5vh 0 0 1.2em; font-size: 1.9rem; line-height: 1.8; }
+    .slide ul ul { margin-top: 0; font-size: 1.7rem; }
+    .slide ol { margin: 1.5vh 0 0 1.2em; font-size: 1.9rem; line-height: 1.8; }
+    .slide ol ul { margin-top: 0; font-size: 1.7rem; }
+    .slide blockquote { border-left: 5px solid var(--accent3); padding-left: 1.2em;
+      font-family: Georgia, "Palatino Linotype", "Hiragino Mincho ProN", "Noto Serif JP", serif;
+      font-size: 1.9rem; line-height: 1.5; color: var(--accent3); margin-top: 2.5vh; font-style: italic; max-width: 80ch; }
+    .slide p { font-size: 1.9rem; line-height: 1.65; max-width: 80ch; }
+    .hint { color: var(--dim); font-size: 1.3rem; margin-top: auto; }
+
+    /* two-column reference grid */
+    .ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1vh 4vw; font-size: 1.7rem; line-height: 1.6; }
+    .ref-grid h3 { font-size: 2rem; margin-bottom: 0; margin-top: 3vh; }
+    .ref-grid h3:first-child { margin-top: 0; }
+    .ref-grid p { max-width: none; }
+
+    /* ── flat timeline ── */
+    .tl-track { position: relative; flex: 1; min-height: 0; }
+    .tl-axis { position: absolute; left: 2%; right: 2%; top: 50%; height: 2px; background: var(--fg); }
+    .tl-mark { position: absolute; top: 50%; transform: translateX(-50%); }
+    .tl-mark::before { content: ''; position: absolute; left: 50%; width: 2px; height: 16px;
+      background: var(--fg); transform: translate(-50%, -50%); }
+    .tl-mark span { position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+      font-size: 0.9rem; color: var(--dim); white-space: nowrap; }
+    .tl-item { position: absolute; bottom: 50%; width: 1px; background: #ccc; }
+    .tl-item .tl-name { position: absolute; top: 0; left: 10px; white-space: nowrap;
+      font-size: 1.1rem; font-weight: 500; color: var(--fg); }
+    .tl-dot { position: absolute; bottom: 50%; transform: translateX(-50%);
+      width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+    .tl-dot .tl-name { position: absolute; top: -6px; left: 14px; white-space: nowrap;
+      font-size: 0.95rem; font-weight: 500; color: var(--accent); }
+    .tl-below { position: absolute; top: 50%; transform: translateX(-50%);
+      width: 8px; height: 8px; border-radius: 50%; background: var(--dim); }
+    .tl-below .tl-name { position: absolute; top: 12px; left: 14px; white-space: nowrap;
+      font-size: 0.95rem; font-weight: 500; color: var(--dim); }
+    .tl-img { position: absolute; bottom: 50%; width: 1px; background: #ccc; }
+    .tl-img img { position: absolute; top: 0; left: 8px; width: 80px; height: 56px;
+      object-fit: cover; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+    .tl-img .tl-name { position: absolute; top: 60px; left: 8px; white-space: nowrap;
+      font-size: 0.85rem; font-weight: 500; color: var(--fg); }
+    .tl-img-below { position: absolute; top: 50%; width: 1px; background: #ccc; transform: translateX(-50%); }
+    .tl-img-below img { position: absolute; bottom: 20px; left: 8px; width: 80px; height: 56px;
+      object-fit: cover; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.15); }
+    .tl-img-below .tl-name { position: absolute; bottom: 0; left: 8px; white-space: nowrap;
+      font-size: 0.85rem; font-weight: 500; color: var(--fg); }
+    .tl-era { position: absolute; top: 0; bottom: 0; opacity: 0.08; border-radius: 6px; }
+    .tl-era-label { position: absolute; top: calc(50% + 320px); transform: translateX(-50%);
+      font-size: 0.9rem; font-weight: 600; white-space: nowrap; z-index: 1; }
+
+    /* split layout for image+text slides */
+    .split { display: flex; gap: 4vw; flex: 1; align-items: center; min-height: 0; }
+    .split-text { flex: 1; min-width: 0; }
+    .split-img { flex: 0 0 40%; max-width: 40%; display: flex; flex-direction: column; gap: 12px;
+      align-items: center; justify-content: center; }
+    .split-img img { max-width: 100%; max-height: 30vh; border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1); object-fit: contain; }
+    .split-img .img-caption { font-size: 0.9rem; color: var(--dim); text-align: center; }
+
+    /* image grid for visual slides */
+    .img-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px; margin-top: 2vh; flex: 1; align-content: start; }
+    .img-grid figure { margin: 0; text-align: center; }
+    .img-grid img { max-width: 100%; max-height: 20vh; border-radius: 6px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08); object-fit: contain; }
+    .img-grid figcaption { font-size: 0.9rem; color: var(--dim); margin-top: 4px; }
+
+    /* interest map */
+    #slide-interest-map { padding: 3vh 2vw 5vh; }
+    #interest-map-container { flex: 1; position: relative; min-height: 0; }
+    .im-svg { width: 100%; height: 100%; }
+    .im-label { font-size: 12px; font-weight: 600; }
+    .im-label-project { font-size: 10px; font-weight: 500; }
+
+    /* contribution graph */
+    .contrib-graph { display: flex; gap: 2px; flex-wrap: wrap; max-width: 700px; margin-top: 2vh; }
+    .contrib-week { display: flex; flex-direction: column; gap: 2px; }
+    .contrib-cell { width: 11px; height: 11px; border-radius: 2px; }
+    .contrib-0 { background: #ebedf0; }
+    .contrib-1 { background: #9be9a8; }
+    .contrib-2 { background: #40c463; }
+    .contrib-3 { background: #30a14e; }
+    .contrib-4 { background: #216e39; }
+
+    /* story slides */
+    .story-num { font-size: 6rem; font-weight: 800; color: var(--accent); opacity: 0.15;
+      position: absolute; top: 3vh; right: 6vw; line-height: 1; }
+    .slide .big-stat { font-size: 3rem; font-weight: 700; color: var(--accent); margin: 2vh 0; }
+
+    /* lang toggle — top-right corner */
+    #lang-toggle { position: fixed; top: 14px; right: 20px; z-index: 20;
+      background: none; border: 1px solid var(--dim); color: var(--dim);
+      border-radius: 6px; padding: 3px 10px; cursor: pointer; font-size: 12px; }
+    #lang-toggle:hover { color: var(--fg); border-color: var(--fg); }
+
+    /* ── timeline slide ── */
+    #slide-timeline { padding: 3vh 2vw 5vh; }
+    #timeline-container { flex: 1; position: relative; min-height: 0; }
+    .tl-svg { width: 100%; height: 100%; }
+
+    /* axis */
+    .tl-year { fill: var(--dim); font-size: 12px; font-weight: 500; }
+
+    /* birth marker */
+    .tl-birth-label { fill: #aaa; font-size: 11px; font-weight: 500; }
+
+    /* resume bars */
+    .tl-bar { fill: #dce4ea; stroke: #b8c4ce; stroke-width: 1; }
+    .tl-bar-academic { fill: #e8dff0; stroke: #baa8d0; }
+    .tl-bar-dropped { stroke-dasharray: 5 3; stroke: var(--accent3); fill: #f5e8e8; }
+    .tl-bar-label-in { fill: #333; font-size: 11px; font-weight: 500; }
+    .tl-bar-label-out { fill: #666; font-size: 11px; }
+    .tl-academic-label { fill: #7a5ab4; }
+
+    /* project dots */
+    .tl-dot { fill: var(--accent); stroke: #fff; stroke-width: 2; }
+    .tl-proj-label { fill: #666; font-size: 10px; }
+    .proj:hover .tl-proj-label { fill: var(--fg); font-weight: 600; }
+    .proj:hover .tl-dot { fill: var(--accent2); r: 9; }
+
+    /* era bands */
+    .tl-era-label { font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase; font-weight: 600; }
+
+    /* moment markers */
+    .tl-moment-label { font-size: 10px; font-weight: 600; }
+
+    /* detail popup */
+    .tl-detail { position: absolute; right: 20px; top: 60px; width: 360px; max-height: calc(100vh - 120px);
+      overflow-y: auto; background: #fff; border: 1px solid #ddd; border-radius: 10px; padding: 16px 18px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08); cursor: pointer; z-index: 20; }
+    .tl-detail-img { width: 100%; max-height: 200px; object-fit: cover; border-radius: 6px;
+      margin-bottom: 10px; }
+    .tl-detail h4 { font-size: 1.05rem; margin-bottom: 8px; color: var(--accent); }
+    .tl-detail-year { color: var(--dim); font-weight: normal; }
+    .tl-detail p { font-size: 0.92rem; line-height: 1.5; color: #444; }
+    .tl-detail-close { margin-top: 10px; font-size: 0.7rem; color: var(--dim); }
+
+    /* layer indicator */
+    #layer-indicator { position: absolute; top: 8px; right: 20px; font-size: 12px; color: var(--dim); }
+    #layer-indicator .layer-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      background: #ddd; margin: 0 3px; vertical-align: middle; }
+    #layer-indicator .layer-dot.active { background: var(--accent); }
+  </style>
+</head>
+<body>
+
+  <!-- S0 · Title -->
+  <section class="slide active">
+    <div style="margin:auto 0">
+      <h1><span data-en="Truth &amp; AI" data-ja="真実とAI"></span></h1>
+      <p class="subtitle" data-en="Reflections on Truth, Expertise, and Agency in the Age of AI"
+         data-ja="AI時代における「真実・専門性・主体性」についての考察"></p>
+      <div style="margin-top:5vh; font-size:1.9rem; line-height:1.8; color: var(--dim);">
+        <span data-en="Leonard Lin" data-ja="レナード・リン"></span><br>
+        <span>Shisa.AI</span><br>
+        <span data-en="Chiba Tech APS-I" data-ja="千葉工大 APS-I"></span><br>
+        <span>2026-06-18</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- S1 · Cold open: the newspaper experiment -->
+  <section class="slide">
+    <h2 data-en="The newspaper experiment" data-ja="新聞の実験"></h2>
+    <p data-en="Richard Wiseman, The Luck Factor: The Scientific Study of the Lucky Mind (2003)"
+       data-ja="リチャード・ワイズマン『The Luck Factor』(2003)"></p>
+    <ul>
+      <li data-en="Wiseman (psychologist, University of Hertfordshire) studied self-described unusually 'lucky' or 'unlucky' people"
+          data-ja="ワイズマン（ハートフォードシャー大学の心理学者）は、自称「特別に運がいい」「運が悪い」人々を研究した"></li>
+      <li data-en="The 'newspaper' experiment:"
+          data-ja="「新聞」の実験：">
+        <ul>
+          <li data-en="Task: count the photographs in this newspaper"
+              data-ja="課題：この新聞の写真の数を数えてください"></li>
+          <li data-en="On average, 'unlucky' people took ~2 minutes — 'lucky' people took just seconds"
+              data-ja="「運が悪い人」は平均約2分かかった ー 「運がいい人」はわずか数秒"></li>
+          <li data-en="Two pages in was a half-page ad telling them the number of photos and to stop counting"
+              data-ja="2ページ目に、写真の数と「数えるのをやめて」と書かれた半ページの広告があった"></li>
+        </ul>
+      </li>
+      <li data-en="What is luck?"
+          data-ja="「運」とは何か？">
+        <ul>
+          <li data-en="Creating and noticing opportunities, listening to intuition, positive expectations, resilient attitude (turning bad luck into good)"
+              data-ja="機会を生み出し、気づくこと、直感に耳を傾けること、前向きな期待、逆境をチャンスに変える姿勢"></li>
+          <li data-en="High extroversion, low anxiety, high openness"
+              data-ja="外向性が高く、不安が低く、開放性が高い"></li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+
+  <!-- S2 · Why I'm here -->
+  <section class="slide">
+    <h2 data-en="Reality Check" data-ja="Reality Check"></h2>
+    <p data-en="A framework for rigorous, systematic analysis of claims, sources, predictions, and argument chains."
+       data-ja="主張・情報源・予測・論証チェーンを厳密かつ体系的に分析するフレームワーク。"></p>
+    <blockquote>
+      <span data-en="With so many hot takes, plausible theories, misinformation, and AI-generated content, sometimes, you need a " data-ja="大量のホットテイク、もっともらしい理論、誤情報、AI生成コンテンツ ー 時には"></span><code>realitycheck</code><span data-en="." data-ja="が必要だ。"></span>
+    </blockquote>
+    <ul>
+      <li data-en="Claim Registry — track claims with evidence levels, credence scores, and relationships"
+          data-ja="Claim Registry — エビデンスレベル、信頼度スコア、関係性で主張を追跡"></li>
+      <li data-en="Source Analysis — structured 3-stage methodology (descriptive → evaluative → dialectical)"
+          data-ja="Source Analysis — 3段階構造化手法（記述的→評価的→弁証法的）"></li>
+      <li data-en="Evidence Links — connect claims to sources with location, quotes, and strength ratings"
+          data-ja="Evidence Links — 位置・引用・強度評価で主張と情報源を接続"></li>
+      <li data-en="Reasoning Trails — document credence assignments with full epistemic provenance"
+          data-ja="Reasoning Trails — 完全な認識論的来歴で信頼度割当を記録"></li>
+      <li data-en="Prediction Tracking — monitor forecasts with falsification criteria and status updates"
+          data-ja="Prediction Tracking — 反証基準とステータスで予測を監視"></li>
+      <li data-en="Argument Chains — map logical dependencies and identify weak links"
+          data-ja="Argument Chains — 論理的依存関係をマッピングし弱点を特定"></li>
+      <li data-en="Semantic Search — find related claims across your entire knowledge base"
+          data-ja="Semantic Search — ナレッジベース全体から関連する主張を検索"></li>
+    </ul>
+    <p style="margin-top:2vh"><a href="https://github.com/lhl/realitycheck">https://github.com/lhl/realitycheck</a></p>
+  </section>
+
+  <!-- S2b · Reality Check — intellectual lineage (flash & skip) -->
+  <section class="slide">
+    <h2 data-en="Truth &amp; AI (we're skipping this)" data-ja="真実とAI（これは飛ばします）"></h2>
+    <div class="ref-grid">
+      <div>
+        <h3 data-en="Argumentation &amp; discourse" data-ja="議論とディスコース"></h3>
+        <p>Toulmin (1958) · Dung (1995) · gIBIS · AIF · AIFdb/OVA+</p>
+        <h3 data-en="Provenance &amp; structured assertions" data-ja="来歴と構造化アサーション"></h3>
+        <p>W3C PROV-O/PROV-DM · Nanopublications · ORKG</p>
+        <h3 data-en="Fact-checking &amp; claim verification" data-ja="ファクトチェックと主張検証"></h3>
+        <p>ClaimReview · FEVER · SciFact · ClaimBuster · ClaimsKG</p>
+        <h3 data-en="Evidence assessment" data-ja="エビデンス評価"></h3>
+        <p>GRADE framework</p>
+      </div>
+      <div>
+        <h3 data-en="Belief revision &amp; drift" data-ja="信念修正とドリフト"></h3>
+        <p>AGM · Truth maintenance systems · Concept drift</p>
+        <h3 data-en="Calibrated forecasting" data-ja="較正された予測"></h3>
+        <p>Brier (1950) · Tetlock · Metaculus · Manifold · GJOpen</p>
+        <h3 data-en="Intelligence tradecraft" data-ja="諜報技術"></h3>
+        <p>Heuer, Psychology of Intelligence Analysis (CIA, 1999) · ACH · Premortem</p>
+        <h3 data-en="Agent / RAG evaluation" data-ja="エージェント / RAG評価"></h3>
+        <p>RAGAs · TruLens</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- S3 · Career timeline (flat HTML) -->
+  <section class="slide">
+    <h2 data-en="Career" data-ja="キャリア"></h2>
+    <div class="tl-track">
+      <div class="tl-axis"></div>
+      <!-- year markers -->
+      <div class="tl-mark" style="left:2%"><span>1980</span></div>
+      <div class="tl-mark" style="left:12.4%"><span>1985</span></div>
+      <div class="tl-mark" style="left:22.9%"><span>1990</span></div>
+      <div class="tl-mark" style="left:33.3%"><span>1995</span></div>
+      <div class="tl-mark" style="left:43.7%"><span>2000</span></div>
+      <div class="tl-mark" style="left:54.2%"><span>2005</span></div>
+      <div class="tl-mark" style="left:64.6%"><span>2010</span></div>
+      <div class="tl-mark" style="left:75%"><span>2015</span></div>
+      <div class="tl-mark" style="left:85.4%"><span>2020</span></div>
+      <div class="tl-mark" style="left:95.9%"><span>2025</span></div>
+      <!-- jobs: all floaters go up, staggered heights, name to the right -->
+      <div class="tl-item" style="left:37.4%; height:36%"><div class="tl-name">Xerox</div></div>
+      <div class="tl-item" style="left:45.8%; height:40%"><div class="tl-name">USC</div></div>
+      <div class="tl-item" style="left:54.2%; height:36%"><div class="tl-name">Yahoo!</div></div>
+      <div class="tl-item" style="left:58.5%; height:46%"><div class="tl-name">Obama '08</div></div>
+      <div class="tl-item" style="left:62.5%; height:42%"><div class="tl-name">Lensley</div></div>
+      <div class="tl-item" style="left:63.25%; height:38%"><div class="tl-name">Sched</div></div>
+      <div class="tl-item" style="left:64%; height:34%"><div class="tl-name">Code for<br>America</div></div>
+      <div class="tl-item" style="left:75%; height:40%"><div class="tl-name">AUGMXNT</div></div>
+      <div class="tl-item" style="left:85.4%; height:42%"><div class="tl-name">AKA Virtual</div></div>
+      <div class="tl-item" style="left:93.7%; height:36%"><div class="tl-name">Shisa.AI</div></div>
+    </div>
+  </section>
+
+  <!-- S3b · Career + education -->
+  <section class="slide">
+    <h2 data-en="Career" data-ja="キャリア"></h2>
+    <div class="tl-track">
+      <div class="tl-axis"></div>
+      <div class="tl-mark" style="left:2%"><span>1980</span></div>
+      <div class="tl-mark" style="left:12.4%"><span>1985</span></div>
+      <div class="tl-mark" style="left:22.9%"><span>1990</span></div>
+      <div class="tl-mark" style="left:33.3%"><span>1995</span></div>
+      <div class="tl-mark" style="left:43.7%"><span>2000</span></div>
+      <div class="tl-mark" style="left:54.2%"><span>2005</span></div>
+      <div class="tl-mark" style="left:64.6%"><span>2010</span></div>
+      <div class="tl-mark" style="left:75%"><span>2015</span></div>
+      <div class="tl-mark" style="left:85.4%"><span>2020</span></div>
+      <div class="tl-mark" style="left:95.9%"><span>2025</span></div>
+      <!-- jobs (from previous slide) -->
+      <div class="tl-item" style="left:37.4%; height:36%"><div class="tl-name">Xerox</div></div>
+      <div class="tl-item" style="left:45.8%; height:40%"><div class="tl-name">USC</div></div>
+      <div class="tl-item" style="left:54.2%; height:36%"><div class="tl-name">Yahoo!</div></div>
+      <div class="tl-item" style="left:58.5%; height:46%"><div class="tl-name">Obama '08</div></div>
+      <div class="tl-item" style="left:62.5%; height:42%"><div class="tl-name">Lensley</div></div>
+      <div class="tl-item" style="left:63.25%; height:38%"><div class="tl-name">Sched</div></div>
+      <div class="tl-item" style="left:64%; height:34%"><div class="tl-name">Code for<br>America</div></div>
+      <div class="tl-item" style="left:75%; height:40%"><div class="tl-name">AUGMXNT</div></div>
+      <div class="tl-item" style="left:85.4%; height:42%"><div class="tl-name">AKA Virtual</div></div>
+      <div class="tl-item" style="left:93.7%; height:36%"><div class="tl-name">Shisa.AI</div></div>
+      <!-- education (new) -->
+      <div class="tl-item" style="left:44%; height:52%"><div class="tl-name" style="color:var(--accent3)">USC<br><small>BFA</small></div></div>
+      <div class="tl-item" style="left:52.5%; height:52%"><div class="tl-name" style="color:var(--accent3)">USC<br><small>MFA (candidate)</small></div></div>
+    </div>
+  </section>
+
+  <!-- S3c · Projects -->
+  <section class="slide">
+    <h2 data-en="Projects" data-ja="プロジェクト"></h2>
+    <div class="tl-track">
+      <div class="tl-axis"></div>
+      <div class="tl-mark" style="left:2%"><span>1980</span></div>
+      <div class="tl-mark" style="left:12.4%"><span>1985</span></div>
+      <div class="tl-mark" style="left:22.9%"><span>1990</span></div>
+      <div class="tl-mark" style="left:33.3%"><span>1995</span></div>
+      <div class="tl-mark" style="left:43.7%"><span>2000</span></div>
+      <div class="tl-mark" style="left:54.2%"><span>2005</span></div>
+      <div class="tl-mark" style="left:64.6%"><span>2010</span></div>
+      <div class="tl-mark" style="left:75%"><span>2015</span></div>
+      <div class="tl-mark" style="left:85.4%"><span>2020</span></div>
+      <div class="tl-mark" style="left:95.9%"><span>2025</span></div>
+      <!-- jobs -->
+      <div class="tl-item" style="left:37.4%; height:36%"><div class="tl-name">Xerox</div></div>
+      <div class="tl-item" style="left:45.8%; height:40%"><div class="tl-name">USC</div></div>
+      <div class="tl-item" style="left:54.2%; height:36%"><div class="tl-name">Yahoo!</div></div>
+      <div class="tl-item" style="left:58.5%; height:46%"><div class="tl-name">Obama '08</div></div>
+      <div class="tl-item" style="left:62.5%; height:42%"><div class="tl-name">Lensley</div></div>
+      <div class="tl-item" style="left:63.25%; height:38%"><div class="tl-name">Sched</div></div>
+      <div class="tl-item" style="left:64%; height:34%"><div class="tl-name">Code for<br>America</div></div>
+      <div class="tl-item" style="left:75%; height:40%"><div class="tl-name">AUGMXNT</div></div>
+      <div class="tl-item" style="left:85.4%; height:42%"><div class="tl-name">AKA Virtual</div></div>
+      <div class="tl-item" style="left:93.7%; height:36%"><div class="tl-name">Shisa.AI</div></div>
+      <!-- education -->
+      <div class="tl-item" style="left:44%; height:52%"><div class="tl-name" style="color:var(--accent3)">USC<br><small>BFA</small></div></div>
+      <div class="tl-item" style="left:52.5%; height:52%"><div class="tl-name" style="color:var(--accent3)">USC<br><small>MFA (candidate)</small></div></div>
+      <!-- projects -->
+      <div class="tl-dot" style="left:27%; margin-bottom:70px"><div class="tl-name">BBS</div></div>
+      <div class="tl-dot" style="left:31%; margin-bottom:130px"><div class="tl-name">WWW</div></div>
+      <div class="tl-dot" style="left:31.5%; margin-bottom:60px"><div class="tl-name">Linux</div></div>
+      <div class="tl-dot" style="left:33.3%; margin-bottom:190px"><div class="tl-name">First Website</div></div>
+      <div class="tl-dot" style="left:37.4%; margin-bottom:250px"><div class="tl-name">First Blog</div></div>
+      <div class="tl-dot" style="left:41.7%; margin-bottom:90px"><div class="tl-name">randomfoo.net</div></div>
+      <div class="tl-dot" style="left:45.8%; margin-bottom:150px"><div class="tl-name">balanceTags</div></div>
+      <div class="tl-dot" style="left:47.9%; margin-bottom:220px"><div class="tl-name">free_culture</div></div>
+      <div class="tl-dot" style="left:50%; margin-bottom:100px"><div class="tl-name">Upcoming.org</div></div>
+      <div class="tl-dot" style="left:52%; margin-bottom:175px"><div class="tl-name">Rolling Resistance</div></div>
+      <div class="tl-dot" style="left:54.2%; margin-bottom:70px"><div class="tl-name">Katrina List<br>Network</div></div>
+      <div class="tl-dot" style="left:56.3%; margin-bottom:120px"><div class="tl-name">Hack Days</div></div>
+      <div class="tl-dot" style="left:60.3%; margin-bottom:45px"><div class="tl-name">blueball</div></div>
+      <div class="tl-dot" style="left:75%; margin-bottom:115px"><div class="tl-name">vrwm</div></div>
+      <div class="tl-dot" style="left:79.2%; margin-bottom:70px"><div class="tl-name">Metabolic<br>research</div></div>
+      <div class="tl-dot" style="left:85.4%; margin-bottom:175px"><div class="tl-name">Japan!</div></div>
+      <div class="tl-dot" style="left:86.5%; margin-bottom:120px"><div class="tl-name">Meterbolic</div></div>
+      <div class="tl-dot" style="left:87.5%; margin-bottom:60px"><div class="tl-name">perfi</div></div>
+      <div class="tl-dot" style="left:91.7%; margin-bottom:130px"><div class="tl-name">llm-tracker</div></div>
+      <div class="tl-dot" style="left:92.9%; margin-bottom:85px"><div class="tl-name">Shisa V1</div></div>
+      <div class="tl-dot" style="left:93.7%; margin-bottom:200px"><div class="tl-name">voicechat2</div></div>
+      <div class="tl-dot" style="left:96.4%; margin-bottom:150px"><div class="tl-name">strix-halo-<br>testing</div></div>
+      <div class="tl-dot" style="left:97.3%; margin-bottom:100px"><div class="tl-name">strixhalo.wiki</div></div>
+      <div class="tl-dot" style="left:98%; margin-bottom:45px"><div class="tl-name">realitycheck</div></div>
+    </div>
+  </section>
+
+  <!-- S3d · Full context timeline -->
+  <section class="slide">
+    <h2 data-en="You can just do things" data-ja="やりたいことは、ただやってみればいい"></h2>
+    <div class="tl-track">
+      <!-- era bands -->
+      <div class="tl-era" style="left:2%; width:31.3%; background:#b8860b"></div>
+      <div class="tl-era" style="left:33.3%; width:20.9%; background:#4a7a5a"></div>
+      <div class="tl-era" style="left:54.2%; width:31.2%; background:#8a5a6a"></div>
+      <div class="tl-era" style="left:68.8%; width:18.7%; background:#6a5a8a"></div>
+      <div class="tl-era" style="left:87.5%; width:10.5%; background:#7a9aba"></div>
+      <!-- era labels -->
+      <div class="tl-era-label" style="left:17.7%; color:#b8860b">PC Revolution</div>
+      <div class="tl-era-label" style="left:43.8%; color:#4a7a5a">Dotcom / Web</div>
+      <div class="tl-era-label" style="left:69.8%; color:#8a5a6a">Mobile / Social</div>
+      <div class="tl-era-label" style="left:78.2%; color:#6a5a8a">VR / Crypto</div>
+      <div class="tl-era-label" style="left:92.8%; color:#7a9aba">AI</div>
+      <div class="tl-axis"></div>
+      <div class="tl-mark" style="left:2%"><span>1980</span></div>
+      <div class="tl-mark" style="left:12.4%"><span>1985</span></div>
+      <div class="tl-mark" style="left:22.9%"><span>1990</span></div>
+      <div class="tl-mark" style="left:33.3%"><span>1995</span></div>
+      <div class="tl-mark" style="left:43.7%"><span>2000</span></div>
+      <div class="tl-mark" style="left:54.2%"><span>2005</span></div>
+      <div class="tl-mark" style="left:64.6%"><span>2010</span></div>
+      <div class="tl-mark" style="left:75%"><span>2015</span></div>
+      <div class="tl-mark" style="left:85.4%"><span>2020</span></div>
+      <div class="tl-mark" style="left:95.9%"><span>2025</span></div>
+      <!-- jobs -->
+      <div class="tl-item" style="left:37.4%; height:36%"><div class="tl-name">Xerox</div></div>
+      <div class="tl-item" style="left:45.8%; height:40%"><div class="tl-name">USC</div></div>
+      <div class="tl-item" style="left:54.2%; height:36%"><div class="tl-name">Yahoo!</div></div>
+      <div class="tl-item" style="left:58.5%; height:46%"><div class="tl-name">Obama '08</div></div>
+      <div class="tl-item" style="left:62.5%; height:42%"><div class="tl-name">Lensley</div></div>
+      <div class="tl-item" style="left:63.25%; height:38%"><div class="tl-name">Sched</div></div>
+      <div class="tl-item" style="left:64%; height:34%"><div class="tl-name">Code for<br>America</div></div>
+      <div class="tl-item" style="left:75%; height:40%"><div class="tl-name">AUGMXNT</div></div>
+      <div class="tl-item" style="left:85.4%; height:42%"><div class="tl-name">AKA Virtual</div></div>
+      <div class="tl-item" style="left:93.7%; height:36%"><div class="tl-name">Shisa.AI</div></div>
+      <!-- education -->
+      <div class="tl-item" style="left:44%; height:52%"><div class="tl-name" style="color:var(--accent3)">USC<br><small>BFA</small></div></div>
+      <div class="tl-item" style="left:52.5%; height:52%"><div class="tl-name" style="color:var(--accent3)">USC<br><small>MFA (candidate)</small></div></div>
+      <!-- projects -->
+      <div class="tl-dot" style="left:27%; margin-bottom:70px"><div class="tl-name">BBS</div></div>
+      <div class="tl-dot" style="left:31%; margin-bottom:130px"><div class="tl-name">WWW</div></div>
+      <div class="tl-dot" style="left:31.5%; margin-bottom:60px"><div class="tl-name">Linux</div></div>
+      <div class="tl-dot" style="left:33.3%; margin-bottom:190px"><div class="tl-name">First Website</div></div>
+      <div class="tl-dot" style="left:37.4%; margin-bottom:250px"><div class="tl-name">First Blog</div></div>
+      <div class="tl-dot" style="left:41.7%; margin-bottom:90px"><div class="tl-name">randomfoo.net</div></div>
+      <div class="tl-dot" style="left:45.8%; margin-bottom:150px"><div class="tl-name">balanceTags</div></div>
+      <div class="tl-dot" style="left:47.9%; margin-bottom:220px"><div class="tl-name">free_culture</div></div>
+      <div class="tl-dot" style="left:50%; margin-bottom:100px"><div class="tl-name">Upcoming.org</div></div>
+      <div class="tl-dot" style="left:52%; margin-bottom:175px"><div class="tl-name">Rolling Resistance</div></div>
+      <div class="tl-dot" style="left:54.2%; margin-bottom:70px"><div class="tl-name">Katrina List<br>Network</div></div>
+      <div class="tl-dot" style="left:56.3%; margin-bottom:120px"><div class="tl-name">Hack Days</div></div>
+      <div class="tl-dot" style="left:60.3%; margin-bottom:45px"><div class="tl-name">blueball</div></div>
+      <div class="tl-dot" style="left:75%; margin-bottom:115px"><div class="tl-name">vrwm</div></div>
+      <div class="tl-dot" style="left:79.2%; margin-bottom:70px"><div class="tl-name">Metabolic<br>research</div></div>
+      <div class="tl-dot" style="left:85.4%; margin-bottom:175px"><div class="tl-name">Japan!</div></div>
+      <div class="tl-dot" style="left:86.5%; margin-bottom:120px"><div class="tl-name">Meterbolic</div></div>
+      <div class="tl-dot" style="left:87.5%; margin-bottom:60px"><div class="tl-name">perfi</div></div>
+      <div class="tl-dot" style="left:91.7%; margin-bottom:130px"><div class="tl-name">llm-tracker</div></div>
+      <div class="tl-dot" style="left:92.9%; margin-bottom:85px"><div class="tl-name">Shisa V1</div></div>
+      <div class="tl-dot" style="left:93.7%; margin-bottom:200px"><div class="tl-name">voicechat2</div></div>
+      <div class="tl-dot" style="left:96.4%; margin-bottom:150px"><div class="tl-name">strix-halo-<br>testing</div></div>
+      <div class="tl-dot" style="left:97.3%; margin-bottom:100px"><div class="tl-name">strixhalo.wiki</div></div>
+      <div class="tl-dot" style="left:98%; margin-bottom:45px"><div class="tl-name">realitycheck</div></div>
+      <!-- historical milestones (below the line) -->
+      <div class="tl-below" style="left:4.1%; margin-top:50px"><div class="tl-name">IBM PC</div></div>
+      <div class="tl-below" style="left:10.3%; margin-top:140px"><div class="tl-name">Mac</div></div>
+      <div class="tl-below" style="left:24.5%; margin-top:100px"><div class="tl-name">WWW</div></div>
+      <div class="tl-below" style="left:25.5%; margin-top:200px"><div class="tl-name">Linux</div></div>
+      <div class="tl-below" style="left:31.2%; margin-top:60px"><div class="tl-name">Netscape</div></div>
+      <div class="tl-below" style="left:33.3%; margin-top:130px"><div class="tl-name">Yahoo!</div></div>
+      <div class="tl-below" style="left:37.4%; margin-top:220px"><div class="tl-name">Palm Pilot</div></div>
+      <div class="tl-below" style="left:39.6%; margin-top:170px"><div class="tl-name">Google</div></div>
+      <div class="tl-below" style="left:50%; margin-top:150px"><div class="tl-name">Blackberry</div></div>
+      <div class="tl-below" style="left:52%; margin-top:80px"><div class="tl-name">Facebook</div></div>
+      <div class="tl-below" style="left:58.3%; margin-top:190px"><div class="tl-name">iPhone</div></div>
+      <div class="tl-below" style="left:62.4%; margin-top:60px"><div class="tl-name">Bitcoin</div></div>
+      <div class="tl-below" style="left:68.8%; margin-top:130px"><div class="tl-name">AlexNet</div></div>
+      <div class="tl-below" style="left:70.9%; margin-top:240px"><div class="tl-name">Oculus DK1</div></div>
+      <div class="tl-below" style="left:75%; margin-top:170px"><div class="tl-name">Ethereum</div></div>
+      <div class="tl-below" style="left:79.2%; margin-top:80px"><div class="tl-name">Transformer</div></div>
+      <div class="tl-below" style="left:89.6%; margin-top:160px"><div class="tl-name">ChatGPT</div></div>
+    </div>
+  </section>
+
+  <!-- S4 · The arc: 1940-2026 historical timeline -->
+  <section class="slide">
+    <h2 data-en="The arc: 80 years" data-ja="80年の軌跡"></h2>
+    <div class="tl-track">
+      <div class="tl-axis"></div>
+      <div class="tl-mark" style="left:2%"><span>1940</span></div>
+      <div class="tl-mark" style="left:13.2%"><span>1950</span></div>
+      <div class="tl-mark" style="left:24.3%"><span>1960</span></div>
+      <div class="tl-mark" style="left:35.5%"><span>1970</span></div>
+      <div class="tl-mark" style="left:46.7%"><span>1980</span></div>
+      <div class="tl-mark" style="left:57.8%"><span>1990</span></div>
+      <div class="tl-mark" style="left:69%"><span>2000</span></div>
+      <div class="tl-mark" style="left:80.1%"><span>2010</span></div>
+      <div class="tl-mark" style="left:91.3%"><span>2020</span></div>
+      <!-- ideas / milestones (above) -->
+      <div class="tl-img" style="left:7.6%; height:250px"><img src="img/bush.jpg"><div class="tl-name">Memex (Bush)</div></div>
+      <div class="tl-img" style="left:13.2%; height:150px"><img src="img/turing.jpg" style="object-position: center 15%"><div class="tl-name">Can Machines Think? (Turing)</div></div>
+      <div class="tl-img" style="left:24.3%; height:250px"><img src="img/nelson.jpg"><div class="tl-name">Hypertext (Nelson)</div></div>
+      <div class="tl-img" style="left:33.3%; height:320px"><img src="img/engelbart-demo.jpg"><div class="tl-name">Mother of All Demos</div></div>
+      <div class="tl-dot" style="left:36.6%; margin-bottom:140px"><div class="tl-name">UNIX (Bell Labs)</div></div>
+      <div class="tl-dot" style="left:41.1%; margin-bottom:80px"><div class="tl-name">Heilmeier ☆</div></div>
+      <div class="tl-img" style="left:48%; height:320px"><img src="img/rms.jpg" style="object-position: center 20%"><div class="tl-name">GNU (Stallman)</div></div>
+      <div class="tl-dot" style="left:49%; margin-bottom:160px"><div class="tl-name">Project Athena ☆</div></div>
+      <div class="tl-dot" style="left:49.6%; margin-bottom:80px"><div class="tl-name">Cyc (Lenat)</div></div>
+      <div class="tl-img" style="left:57.8%; height:240px"><img src="img/tbl-www.jpg"><div class="tl-name">WWW (TBL)</div></div>
+      <div class="tl-dot" style="left:82.3%; margin-bottom:100px"><div class="tl-name">AlexNet</div></div>
+      <div class="tl-dot" style="left:86.8%; margin-bottom:180px"><div class="tl-name">Transformer</div></div>
+      <!-- below the line -->
+      <div class="tl-img-below" style="left:7.6%; height:250px"><img src="img/vonneumann.jpg"><div class="tl-name">von Neumann Architecture</div></div>
+      <div class="tl-img-below" style="left:22.1%; height:140px"><img src="img/perceptron.svg"><div class="tl-name">Perceptron</div></div>
+      <div class="tl-img-below" style="left:34.4%; height:260px"><img src="img/arpanet.png"><div class="tl-name">ARPANET</div></div>
+      <div class="tl-img-below" style="left:38.9%; height:170px"><img src="img/alto.jpg"><div class="tl-name">Xerox PARC</div></div>
+      <div class="tl-below" style="left:44.5%; margin-top:60px"><div class="tl-name">Apple II</div></div>
+      <div class="tl-below" style="left:60%; margin-top:150px"><div class="tl-name">Mosaic</div></div>
+      <div class="tl-below" style="left:64.6%; margin-top:60px"><div class="tl-name">Google</div></div>
+      <div class="tl-below" style="left:69%; margin-top:140px"><div class="tl-name">Wikipedia</div></div>
+      <div class="tl-below" style="left:72.3%; margin-top:70px"><div class="tl-name">Facebook</div></div>
+      <div class="tl-below" style="left:75.6%; margin-top:190px"><div class="tl-name">iPhone</div></div>
+      <div class="tl-below" style="left:88%; margin-top:60px"><div class="tl-name">GPT-2</div></div>
+      <div class="tl-below" style="left:92.5%; margin-top:140px"><div class="tl-name">ChatGPT</div></div>
+      <div class="tl-below" style="left:96.3%; margin-top:70px"><div class="tl-name">Fable 5</div></div>
+    </div>
+  </section>
+
+  <!-- S4b · Weblog -->
+  <section class="slide">
+    <h2>Weblog</h2>
+    <div style="flex:1; display:flex; align-items:center; justify-content:center; min-height:0">
+      <img src="img/weblog.png" style="max-width:90%; max-height:100%; object-fit:contain; border-radius:6px">
+    </div>
+  </section>
+
+  <!-- S4c · free_culture -->
+  <section class="slide">
+    <h2>free_culture</h2>
+    <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:0">
+      <img src="img/free-culture.png" style="max-width:80%; max-height:90%; object-fit:contain; border-radius:6px">
+      <p style="margin-top:2vh; font-size:1.4rem; color:var(--dim)">
+        <a href="https://randomfoo.net/oscon/2002/lessig/" style="color:var(--accent)">https://randomfoo.net/oscon/2002/lessig/</a>
+      </p>
+    </div>
+  </section>
+
+  <!-- S5 · Story: balanceTags -->
+  <section class="slide">
+    <h2>balanceTags()</h2>
+    <blockquote data-en="This code has run trillions of times and has touched ⅓ of the content on the web."
+                data-ja="このコードは数兆回実行され、ウェブ上のコンテンツの⅓に触れてきた。"></blockquote>
+    <pre style="margin-top:3vh; font-size:1rem; line-height:1.5"><code class="language-php">/**
+ * Balances tags of string using a modified stack.
+ *
+ * @since 2.0.4
+ * @since 5.3.0 Improve accuracy and add support for custom element tags.
+ *
+ * @author Leonard Lin &lt;leonard@acm.org&gt;
+ * @license GPL
+ * @copyright November 4, 2001
+ * @version 1.1
+ *
+ * @param string $text Text to be balanced.
+ * @return string Balanced text.
+ */
+function force_balance_tags( $text ) {
+    $tagstack  = array();
+    $stacksize = 0;
+    $tagqueue  = '';
+    $newtext   = '';
+    // Known single-entity/self-closing tags.
+    $single_tags = array( 'area', 'base', 'basefont', 'br', 'col',
+        'command', 'embed', 'frame', 'hr', 'img', 'input', 'isindex',
+        'link', 'meta', 'param', 'source', 'track', 'wbr' );
+    // Tags that can be immediately nested within themselves.
+    $nestable_tags = array( 'article', 'aside', 'blockquote', 'details',
+        'div', 'figure', 'object', 'q', 'section', 'span' );
+
+    // WP bug fix for comments - in case you REALLY meant to type '&lt; !--'.
+    $text = str_replace( '&lt; !--', '&lt;    !--', $text );
+    // WP bug fix for LOVE &lt;3 (and other situations with '&lt;' before a number).
+    $text = preg_replace( '#&lt;([0-9]{1})#', '&amp;lt;$1', $text );
+    ...</code></pre>
+  </section>
+
+  <!-- S6 · Story: shisa-v1 -->
+  <section class="slide">
+    <h2>Shisa V1</h2>
+    <div style="flex:1; display:flex; align-items:center; justify-content:center; min-height:0">
+      <img src="img/shisa-v1.png" style="max-width:90%; max-height:100%; object-fit:contain; border-radius:6px">
+    </div>
+  </section>
+
+  <!-- S6b · How? -->
+  <section class="slide">
+    <h2>How?</h2>
+    <div style="flex:1; display:flex; align-items:center; justify-content:center; min-height:0">
+      <img src="img/shisa-how.png" style="max-width:90%; max-height:90%; object-fit:contain; border-radius:6px">
+    </div>
+    <p style="font-size:1.4rem; color:var(--dim)">
+      <a href="https://github.com/AUGMXNT/shisa/wiki/A-Review-of-Public-Japanese-Training-Sets#analysis" style="color:var(--accent)">https://github.com/AUGMXNT/shisa/wiki/A-Review-of-Public-Japanese-Training-Sets#analysis</a>
+    </p>
+  </section>
+
+  <!-- S6c · Shisa V2 405B -->
+  <section class="slide">
+    <h2>Shisa V2 405B</h2>
+    <div style="flex:1; display:flex; align-items:center; justify-content:center; min-height:0">
+      <img src="img/shisa-v2.png" style="max-width:90%; max-height:90%; object-fit:contain; border-radius:6px">
+    </div>
+    <p style="font-size:1.4rem; color:var(--dim)">
+      <a href="https://blog.shisa.ai/posts/shisa-v2-405b/" style="color:var(--accent)">https://blog.shisa.ai/posts/shisa-v2-405b/</a>
+    </p>
+  </section>
+
+  <!-- S7 · Sci-fi world -->
+  <section class="slide">
+    <h2 data-en="We live in a sci-fi world" data-ja="私たちはSFの世界に生きている"></h2>
+    <p data-en="Fiction as a cognitive tool — not prediction, but a lens for navigating futures."
+       data-ja="フィクションは認知ツール ー 予測ではなく、未来を読み解くレンズ。"></p>
+    <ul>
+      <li data-en="Snow Crash (1992) → prompt injection · Diamond Age (1995) → AI tutors (2024)"
+          data-ja="スノウ・クラッシュ(1992) → プロンプト・インジェクション · ダイヤモンド・エイジ(1995) → AIチューター(2024)"></li>
+      <li data-en="Vinge's Zones of Thought → access to cognition gated by jurisdiction (last week!)"
+          data-ja="ヴィンジの「思考の領域」→ 管轄権によるAIアクセス制限（先週のこと！）">
+        <ul><li data-en="A Net of a Million Lies — all spam, all the time"
+                data-ja="百万の嘘のネット ー すべてがスパム、いつも"></li></ul></li>
+      <li data-en="Three-Body Problem's Sophon → sabotaging knowledge (also last week!)"
+          data-ja="『三体』の智子(ソフォン) → 知識の妨害（これも先週！）">
+        <ul><li data-en="Anthropic said they would secretly sabotage your ML projects"
+                data-ja="Anthropicが密かにMLプロジェクトを妨害すると発言"></li></ul></li>
+      <li data-en="Idiocracy (2006) → [gestures broadly]"
+          data-ja="イディオクラシー(2006) → [あたり一帯を手で示す]"></li>
+    </ul>
+    <hr style="border:none; border-top:1px solid var(--card-border); margin:2vh 0">
+    <ul>
+      <li data-en="Situational Awareness: The Decade Ahead" data-ja="Situational Awareness: The Decade Ahead">
+        <ul><li><a href="https://situational-awareness.ai/" style="color:var(--accent)">https://situational-awareness.ai/</a></li></ul></li>
+      <li data-en="AI 2027" data-ja="AI 2027">
+        <ul><li><a href="https://ai-2027.com/" style="color:var(--accent)">https://ai-2027.com/</a></li></ul></li>
+      <li data-en="Europe 2031: What getting AI wrong means for us" data-ja="Europe 2031: AIを誤った方向に進めることの代償">
+        <ul><li><a href="https://europe2031.ai/" style="color:var(--accent)">https://europe2031.ai/</a></li></ul></li>
+    </ul>
+    <blockquote data-en=""The map is not the territory — but sometimes the map is drawn first and the territory follows.""
+       data-ja="「地図は領土ではない ー しかし時に地図が先に描かれ、領土がそれに従う」"></blockquote>
+    <p class="hint" data-en="Bruce Sterling: sci-fi as design fiction — speculative prototyping, not entertainment"
+       data-ja="ブルース・スターリング：SFはデザイン・フィクション ー 思弁的プロトタイピング"></p>
+  </section>
+
+  <!-- S8 · What just happened — sci-fi becomes reality -->
+  <section class="slide">
+    <h2 data-en="What just happened (realitycheck)" data-ja="先週、何が起きたか (realitycheck)"></h2>
+    <p data-en="June 12, 2026 — the US government issued an export control directive to Anthropic, barring all foreign nationals from accessing Claude Fable 5 and Mythos 5."
+       data-ja="2026年6月12日 — 米国政府がAnthropicに輸出規制指令を発出。全外国人のClaude Fable 5・Mythos 5へのアクセスを禁止。"></p>
+    <blockquote data-en=""The first federally directed takedown of a deployed commercial frontier model.""
+       data-ja="「商用フロンティアモデルへの初の連邦指令による停止措置」"></blockquote>
+    <ul>
+      <li data-en="Three conflicting accounts: government, Anthropic, Amazon — who's telling the truth?"
+          data-ja="3つの矛盾する説明：政府、Anthropic、Amazon ー 誰が真実を語っているのか？"></li>
+      <li data-en="Your access to US frontier AI is now demonstrably revocable"
+          data-ja="米国フロンティアAIへのアクセスは、取り消し可能であることが証明された"></li>
+      <li data-en="Japan: GENIAC, sovereign AI, allied access — this affects you directly"
+          data-ja="日本：GENIAC、ソブリンAI、同盟国アクセス ー これは皆さんに直接影響する"></li>
+    </ul>
+    <p class="hint" data-en="We live in a sci-fi world. Not one of the good ones." data-ja="私たちはSFの世界に生きている。良いSFの世界ではないけれど。"></p>
+  </section>
+
+  <!-- S9 · The Truth Problem -->
+  <section class="slide">
+    <h2 data-en="Truth &amp; AI" data-ja="真実とAI"></h2>
+    <p data-en="Truth is always constructed (it's just more obvious now with AI)."
+       data-ja="真実は常に構築されている（AIでそれがより明らかになっただけ）。"></p>
+    <ol>
+      <li data-en="Truth as verification" data-ja="検証としての真実">
+        <ul><li data-en="claims, credence, evidence chains (realitycheck)" data-ja="主張、信頼度、証拠連鎖 (realitycheck)"></li></ul></li>
+      <li data-en="Truth as relational" data-ja="関係性としての真実">
+        <ul><li data-en="Schön/Rein: frames determine what counts as fact" data-ja="ショーン/ライン：フレームが事実を決定する"></li></ul></li>
+      <li data-en="Truth as historical context" data-ja="歴史的文脈としての真実">
+        <ul><li data-en="you can't understand ChatGPT without the arc" data-ja="歴史の流れなしにChatGPTは理解できない"></li></ul></li>
+      <li data-en="Truth as post-facto" data-ja="事後的な真実">
+        <ul><li data-en="the impact you can't know at the time" data-ja="その時には知り得ない影響"></li></ul></li>
+      <li data-en="Truth as constructed" data-ja="構築された真実">
+        <ul><li data-en="Heilmeier's catechism creates 'worthy' by defining it" data-ja="ハイルマイヤーの問いは「価値あるもの」を定義により創造する"></li></ul></li>
+      <li data-en="Truth through fiction" data-ja="フィクションによる真実">
+        <ul><li data-en="the map drawn before the territory exists" data-ja="領土が存在する前に描かれた地図"></li></ul></li>
+    </ol>
+    <blockquote data-en=""Post-truth isn't that truth disappeared. It's that the cost of producing plausible content in any frame dropped to zero.""
+       data-ja="「ポスト真実とは真実が消えたことではない。あらゆるフレームでもっともらしいコンテンツを生産するコストがゼロになったことだ」"></blockquote>
+  </section>
+
+  <!-- S10 · Athena + Heilmeier callback -->
+  <section class="slide">
+    <h2 data-en="A project is never just its technology" data-ja="プロジェクトは技術だけではない"></h2>
+    <div class="split">
+      <div class="split-text">
+        <p data-en="Lessons from the readings"
+           data-ja="課題文献からの教訓"></p>
+        <ul>
+          <li data-en="Athena produced X11 and Kerberos" data-ja="AthenaはX11とKerberosを生んだ">
+            <ul><li data-en="mundane by-products that outlasted the grand vision" data-ja="壮大なビジョンより長く残った「地味な」副産物"></li></ul></li>
+          <li data-en="'Techno-romantics vs humano-romantics'" data-ja="「テクノロマン派 vs ヒューマノロマン派」">
+            <ul><li data-en="today's accelerationist vs safety debate" data-ja="今日の加速主義 vs 安全性の議論"></li></ul></li>
+          <li data-en="Heilmeier Q4: 'Who cares?'" data-ja="ハイルマイヤー問4：「誰にとって重要か？」">
+            <ul><li data-en="you don't always know until after you ship" data-ja="リリースするまでわからないことがある"></li></ul></li>
+        </ul>
+        <blockquote data-en=""Your course uses Claude as a structured pedagogy tool. You're living the Papert vision that Athena's designers rejected.""
+           data-ja="「このコースはClaudeを構造化された教育ツールとして使っている。皆さんはAthenaの設計者が拒否したパパートのビジョンを体現している」"></blockquote>
+      </div>
+      <div class="split-img">
+        <img src="img/papert.jpg" alt="Seymour Papert">
+        <div class="img-caption" data-en="Seymour Papert — 'things to think with'" data-ja="シーモア・パパート「考えるための道具」"></div>
+        <img src="img/nelson.jpg" alt="Ted Nelson" style="margin-top: 8px">
+        <div class="img-caption" data-en="Ted Nelson — hypertext, Xanadu" data-ja="テッド・ネルソン — ハイパーテキスト、ザナドゥ"></div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+  <!-- Next hour -->
+  <section class="slide">
+    <h1>Next Hour</h1>
+    <h2>Agentic Coding Workshop</h2>
+    <ul>
+      <li>realitycheck</li>
+      <li>devstack
+        <ul><li>autoloop</li></ul></li>
+      <li>shisad
+        <ul>
+          <li>agentic_memory</li>
+          <li>agentic_security</li>
+        </ul></li>
+    </ul>
+    <p style="margin-top:2vh; font-size:1.4rem">
+      <a href="https://drive.google.com/file/d/1bedG5kYzkgsKjwjfUZlNuI6FLhlfcJkG/view?usp=sharing" style="color:var(--accent)">Toward the Dark Factory: Agentic Engineering, Harness Design, and Securing the Pipeline (PDF)</a>
+    </p>
+  </section>
+
+  <button id="lang-toggle">EN→JA (L)</button>
+
+  <script src="lib/d3.v7.min.js"></script>
+  <script>
+    // Generate GitHub-style contribution graph
+    // Pattern: sparse before 2024, increasingly dense 2024-2026
+    (function() {
+      const el = document.getElementById("contrib-graph");
+      if (!el) return;
+      const weeks = 52 * 3; // ~3 years
+      for (let w = 0; w < weeks; w++) {
+        const col = document.createElement("div");
+        col.className = "contrib-week";
+        for (let d = 0; d < 7; d++) {
+          const cell = document.createElement("div");
+          const yearFrac = w / weeks; // 0=start, 1=now
+          let level;
+          if (yearFrac < 0.33) {
+            level = Math.random() < 0.12 ? (Math.random() < 0.3 ? 2 : 1) : 0;
+          } else if (yearFrac < 0.66) {
+            level = Math.random() < 0.45 ? Math.ceil(Math.random() * 3) : 0;
+          } else {
+            level = Math.random() < 0.7 ? Math.ceil(Math.random() * 4) : 0;
+          }
+          cell.className = `contrib-cell contrib-${level}`;
+          col.appendChild(cell);
+        }
+        el.appendChild(col);
+      }
+    })();
+  </script>
+  <script>hljs.highlightAll();</script>
+  <script type="module" src="js/deck.js"></script>
+</body>
+</html>
