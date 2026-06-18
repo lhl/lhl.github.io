@@ -9,8 +9,8 @@ const slides = [...document.querySelectorAll(".slide")];
 // 0 title, 1 newspaper, 2 reality check, 3 truth&ai refs, 4 career, 5 career+edu,
 // 6 projects, 7 "you can just do things", 8 arc, 9 weblog, 10 free_culture,
 // 11 balanceTags, 12 shisa-v1, 13 how?, 14 shisa-v2, 15 sci-fi, 16 what happened,
-// 17 truth&ai, 18 athena/heilmeier, 19 next hour
-const slideOrder = [0,1,2,3,4,5,6,7,8, 7,9, 7,11, 7,10, 7,12,13,14, 15,16,17,18, 19];
+// 17 realitycheck screenshot, 18 truth&ai, 19 athena/heilmeier, 20 next hour
+const slideOrder = [0,1,2,3,4,5,6,7,8, 7,9, 7,11, 7,10, 7,12,13,14, 15,16,17,18,19, 20];
 
 let pos = 0;
 
